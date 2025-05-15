@@ -21,7 +21,7 @@
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       box-sizing: border-box;
     }
-    h2 {
+    h2, h3 {
       text-align: center;
       color: #666;
     }
@@ -133,25 +133,55 @@
         <tbody></tbody>
       </table>
     </div>
+
+    <hr />
+    <h3>Settings</h3>
+    <label for="newUsername">New Username:</label>
+    <input type="text" id="newUsername" />
+    <label for="newPassword">New Password:</label>
+    <input type="password" id="newPassword" />
+    <button onclick="changeCredentials()">Save New Credentials</button>
+    <p id="settingsMsg" style="color:green;"></p>
   </div>
 
   <script>
-    const users = {
+    const defaultUsers = {
       'Tyri': '0452',
       'Maki': '112621',
       'Tapado': '0000'
     };
 
+    function getStoredUsers() {
+      let stored = JSON.parse(localStorage.getItem('customUsers') || '{}');
+      return { ...defaultUsers, ...stored };
+    }
+
     function login() {
       const username = document.getElementById('username').value;
       const password = document.getElementById('password').value;
-      if (users[username] === password) {
+      const allUsers = getStoredUsers();
+      if (allUsers[username] === password) {
         document.getElementById('login').style.display = 'none';
         document.getElementById('main').style.display = 'block';
         loadData();
       } else {
         document.getElementById('loginError').innerText = 'Invalid credentials';
       }
+    }
+
+    function changeCredentials() {
+      const newUser = document.getElementById('newUsername').value;
+      const newPass = document.getElementById('newPassword').value;
+      if (!newUser || !newPass) {
+        document.getElementById('settingsMsg').style.color = 'red';
+        document.getElementById('settingsMsg').innerText = 'Both fields are required';
+        return;
+      }
+      let current = JSON.parse(localStorage.getItem('customUsers') || '{}');
+      current[newUser] = newPass;
+      localStorage.setItem('customUsers', JSON.stringify(current));
+      document.getElementById('settingsMsg').style.color = 'green';
+      document.getElementById('settingsMsg').innerText = 'New credentials saved!';
     }
 
     function updateIncome() {
