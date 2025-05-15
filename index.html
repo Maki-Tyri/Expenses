@@ -40,10 +40,15 @@
       border: none;
       cursor: pointer;
     }
+    .table-wrapper {
+      overflow-x: auto;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
     }
     th, td {
       border: 1px solid #ddd;
@@ -120,12 +125,14 @@
     <input type="text" id="expItem" />
     <button onclick="addExpense()">Add Expense</button>
 
-    <table id="expenseTable">
-      <thead>
-        <tr><th>No.</th><th>Date</th><th>Amount (₱)</th><th>Item</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-wrapper">
+      <table id="expenseTable">
+        <thead>
+          <tr><th>No.</th><th>Date</th><th>Amount (₱)</th><th>Item</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
