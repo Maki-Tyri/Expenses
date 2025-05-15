@@ -2,259 +2,190 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Maki Web 💍</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maki Web - Login</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      font-family: Helvetica, Arial, sans-serif;
-      background: url('224a9463-cf14-4d02-ae12-8cedb344f885.jpg') no-repeat center center fixed;
-      background-size: cover;
+      background: #f5f5f5;
     }
-
-    .container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-
-    .login-box {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 30px;
-      width: 380px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    .login-container, .main-container {
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 20px;
       border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+    }
+    h2 {
       text-align: center;
+      color: #666;
     }
-
-    .login-box h1 {
-      color: #e91e63;
-      font-size: 36px;
-      margin-bottom: 20px;
-    }
-
-    .login-box p {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    .login-box input {
+    label, input, button {
+      display: block;
       width: 100%;
-      padding: 14px;
-      margin: 8px 0;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    .login-box button {
-      width: 100%;
-      background: #0000FF; /* Blue */
-      color: white;
-      font-weight: bold;
-      padding: 14px;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
       margin-top: 10px;
+      box-sizing: border-box;
     }
-
-    .login-box button:hover {
-      background: #0040ff;
+    input, button {
+      padding: 10px;
     }
-
-    .message-container {
-      display: none;
-      padding: 40px;
-      background-color: rgba(255, 255, 255, 0.9);
-      min-height: 100vh;
-      text-align: center;
-    }
-
-    #message {
-      color: #880e4f;
-      white-space: pre-wrap;
-      font-size: 1.5em;
-      animation: fadeIn 2s ease-in-out forwards;
-      opacity: 0;
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
-
-    iframe {
-      display: none;
-    }
-
-    button.choice {
-      margin: 20px 10px;
-      padding: 10px 20px;
+    button {
+      background: #666;
+      color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 18px;
       cursor: pointer;
-      transition: 0.3s ease;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-
-    #yesBtn {
-      background-color: #28a745;
-      color: white;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
     }
-
-    #noBtn {
-      background-color: #dc3545;
-      color: white;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
     }
-
-    .heart {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      font-size: 50px;
-      color: #ff4081;
-      animation: heartbeat 1s infinite;
-      z-index: 100;
-      transform-origin: center center;
+    th {
+      background-color: #f2f2f2;
     }
-
-    @keyframes heartbeat {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+    .highlight {
+      background: #f9f9f9;
     }
-
-    .sparkle {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 10px;
-      height: 10px;
-      background-color: #ff4081;
-      border-radius: 50%;
-      animation: sparkleEffect 0.8s linear infinite;
-    }
-
-    @keyframes sparkleEffect {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
+    @media (max-width: 600px) {
+      input, button {
+        font-size: 16px;
+      }
+      table, thead, tbody, th, td, tr {
+        display: block;
+        width: 100%;
+      }
+      thead tr {
+        display: none;
+      }
+      td {
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+        border: none;
+        border-bottom: 1px solid #ddd;
+      }
+      td::before {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        text-align: left;
+        font-weight: bold;
+      }
+      td:nth-of-type(1)::before { content: "No."; }
+      td:nth-of-type(2)::before { content: "Date"; }
+      td:nth-of-type(3)::before { content: "Amount (₱)"; }
+      td:nth-of-type(4)::before { content: "Item"; }
     }
   </style>
 </head>
 <body>
-
-  <!-- Login Page -->
-  <div class="container" id="loginPage">
-    <div class="login-box">
-      <h1>Maki Web</h1>
-      <p>Log in to continue</p>
-      <input type="text" id="username" placeholder="Username" />
-      <input type="password" id="password" placeholder="Password" />
-      <button onclick="login()">Log In</button>
-    </div>
+  <div class="login-container" id="login">
+    <h2>Maki Web</h2>
+    <label for="username">Username:</label>
+    <input type="text" id="username" />
+    <label for="password">Password:</label>
+    <input type="password" id="password" />
+    <button onclick="login()">Login</button>
+    <p id="loginError" style="color:red;"></p>
   </div>
 
-  <!-- Proposal Message -->
-  <div class="message-container" id="messageContainer">
-    <div id="message"></div>
-    <br />
-    <button id="yesBtn" class="choice" onclick="sayYes()">Yes 💍</button>
-    <button id="noBtn" class="choice" onclick="shrinkNo()">No 🙈</button>
+  <div class="main-container" id="main" style="display:none;">
+    <h2>Expense Report</h2>
+    <label>Income (₱):</label>
+    <input type="number" id="income" />
+    <button onclick="updateIncome()">Update Income</button>
+    <p><strong>Income:</strong> ₱<span id="displayIncome">0.00</span></p>
+    <p><strong>Expenses:</strong> ₱<span id="displayExpenses">0.00</span></p>
+    <p><strong>Balance:</strong> ₱<span id="displayBalance">0.00</span></p>
 
-    <!-- YouTube player (hidden) -->
-    <iframe
-      id="ytplayer"
-      src=""
-      allow="autoplay"
-      allowfullscreen
-      frameborder="0"
-      width="0"
-      height="0"
-    ></iframe>
+    <h3>Add Expense</h3>
+    <label>Date:</label>
+    <input type="date" id="expDate" />
+    <label>Amount (₱):</label>
+    <input type="number" id="expAmount" />
+    <label>Item:</label>
+    <input type="text" id="expItem" />
+    <button onclick="addExpense()">Add Expense</button>
+
+    <table id="expenseTable">
+      <thead>
+        <tr><th>No.</th><th>Date</th><th>Amount (₱)</th><th>Item</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
 
   <script>
+    const users = {
+      'Tyri': '0452',
+      'Maki': '112621',
+      'Tapado': '0000'
+    };
+
     function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-
-      if (user === 'Tyri' && pass === '0452') {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('messageContainer').style.display = 'block';
-
-        // Play music from YouTube
-        const ytplayer = document.getElementById('ytplayer');
-        ytplayer.src = "https://www.youtube.com/embed/wLcGOpZgmj4?autoplay=1&loop=1&playlist=wLcGOpZgmj4&mute=0";
-
-        typeWriter();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      if (users[username] === password) {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+        loadData();
       } else {
-        alert('Incorrect username or password!');
+        document.getElementById('loginError').innerText = 'Invalid credentials';
       }
     }
 
-    const msg = `I've loved you since I can't remember when,
-and I'm gonna love you till I can't forget how. 💞
-
-Will you marry me? 💍`;
-
-    let i = 0;
-    const speed = 40;
-
-    function typeWriter() {
-      if (i < msg.length) {
-        document.getElementById("message").innerHTML += msg.charAt(i);
-        i++;
-        setTimeout(typeWriter, speed);
-      }
+    function updateIncome() {
+      const income = parseFloat(document.getElementById('income').value) || 0;
+      localStorage.setItem('income', income);
+      localStorage.setItem('expenses', '0');
+      localStorage.setItem('expenseList', JSON.stringify([]));
+      loadData();
     }
 
-    let yesFont = 18;
-    let noFont = 18;
+    function addExpense() {
+      const date = document.getElementById('expDate').value;
+      const amount = parseFloat(document.getElementById('expAmount').value);
+      const item = document.getElementById('expItem').value;
+      if (!date || !amount || !item) return;
 
-    function shrinkNo() {
-      const yes = document.getElementById("yesBtn");
-      const no = document.getElementById("noBtn");
-      yesFont += 5;
-      noFont -= 2;
-      yes.style.fontSize = yesFont + "px";
-      no.style.fontSize = noFont + "px";
-      if (noFont <= 6) {
-        no.style.display = "none";
-      }
+      let expenseList = JSON.parse(localStorage.getItem('expenseList') || '[]');
+      expenseList.push({ date, amount, item });
+      localStorage.setItem('expenseList', JSON.stringify(expenseList));
+
+      let totalExpenses = expenseList.reduce((sum, e) => sum + e.amount, 0);
+      localStorage.setItem('expenses', totalExpenses);
+      loadData();
     }
 
-    function sayYes() {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.innerHTML = '❤️';
-      document.body.appendChild(heart);
+    function loadData() {
+      const income = parseFloat(localStorage.getItem('income') || '0');
+      const expenses = parseFloat(localStorage.getItem('expenses') || '0');
+      const balance = income - expenses;
+      document.getElementById('displayIncome').innerText = income.toFixed(2);
+      document.getElementById('displayExpenses').innerText = expenses.toFixed(2);
+      document.getElementById('displayBalance').innerText = balance.toFixed(2);
 
-      triggerConfetti();
-
-      setTimeout(() => {
-        alert("💖 She said YES! 💍💖");
-      }, 1000);
-    }
-
-    function triggerConfetti() {
-      for (let i = 0; i < 100; i++) {
-        const sparkle = document.createElement('div');
-        sparkle.classList.add('sparkle');
-        sparkle.style.left = Math.random() * 100 + 'vw';
-        sparkle.style.top = Math.random() * 100 + 'vh';
-        document.body.appendChild(sparkle);
-        setTimeout(() => {
-          sparkle.remove();
-        }, 1500);
-      }
+      const expenseList = JSON.parse(localStorage.getItem('expenseList') || '[]');
+      const tbody = document.querySelector('#expenseTable tbody');
+      tbody.innerHTML = '';
+      expenseList.forEach((e, i) => {
+        const row = `<tr><td>${i + 1}</td><td>${e.date}</td><td>${e.amount.toFixed(2)}</td><td>${e.item}</td></tr>`;
+        tbody.innerHTML += row;
+      });
     }
   </script>
-
 </body>
 </html>
