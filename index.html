@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -8,64 +8,27 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      background: #f0f0f0;
-    }
-    .page {
-      display: none;
-      height: 100vh;
-      width: 100vw;
-      flex-direction: column;
-    }
-    .active {
-      display: flex !important;
-    }
+    html, body { height: 100%; margin: 0; padding: 0; background: #f0f0f0; }
+    .page { display: none; height: 100vh; width: 100vw; flex-direction: column; }
+    .active { display: flex !important; }
     #loginPage, #signupPage, #dashboard, #settingsPage {
-      justify-content: center;
-      align-items: center;
-      background: #f0f0f0;
+      justify-content: center; align-items: center; background: #f0f0f0;
     }
     .container {
-      background: white;
-      padding: 24px;
-      border-radius: 12px;
+      background: white; padding: 24px; border-radius: 12px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      width: 90%;
-      max-width: 400px;
-      max-height: 95vh;
-      overflow-y: auto;
+      width: 90%; max-width: 400px; max-height: 95vh; overflow-y: auto;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #0062ff;
-    }
+    h2 { text-align: center; margin-bottom: 20px; color: #0062ff; }
     input, select, button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      width: 100%; padding: 12px; margin: 10px 0; font-size: 16px;
+      border-radius: 8px; border: 1px solid #ccc;
     }
     button {
-      background-color: #0062ff;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
+      background-color: #0062ff; color: white; font-weight: bold; cursor: pointer;
     }
-    .link {
-      text-align: center;
-      margin-top: 10px;
-    }
-    .link a {
-      text-decoration: none;
-      color: #0062ff;
-      font-size: 14px;
-    }
+    .link { text-align: center; margin-top: 10px; }
+    .link a { text-decoration: none; color: #0062ff; font-size: 14px; }
     .danger { background: #e74c3c; }
     .green { background: #2ecc71; }
     .orange { background: #f39c12; }
@@ -77,8 +40,7 @@
 </head>
 <body>
 
-<!-- Login Page -->
-<div id="loginPage" class="page active">
+<div id="loginPage" class="page">
   <div class="container">
     <h2>Savings Tracker</h2>
     <input type="text" id="loginUser" placeholder="Username" />
@@ -88,7 +50,6 @@
   </div>
 </div>
 
-<!-- Signup Page -->
 <div id="signupPage" class="page">
   <div class="container">
     <h2>Create Account</h2>
@@ -99,7 +60,6 @@
   </div>
 </div>
 
-<!-- Dashboard -->
 <div id="dashboard" class="page">
   <div class="container">
     <h2>Welcome, <span id="usernameDisplay"></span></h2>
@@ -119,7 +79,6 @@
   </div>
 </div>
 
-<!-- Settings Page -->
 <div id="settingsPage" class="page">
   <div class="container">
     <h2>Settings</h2>
@@ -228,24 +187,19 @@
   function exportPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-
     const user = localStorage.getItem('currentUser');
     let data = JSON.parse(localStorage.getItem('data_' + user)) || [];
-
     doc.setFontSize(22);
     doc.setTextColor(0, 102, 255);
     doc.text("Savings Report", 14, 20);
-
     doc.setFontSize(14);
     doc.setTextColor(0);
     doc.text(`User: ${user}`, 14, 28);
-
     const headers = ["#", "Type", "Amount (₱)", "Date"];
     const colWidths = [10, 30, 35, 110];
     const startX = 14;
     let startY = 36;
     const rowHeight = 10;
-
     doc.setFillColor(0, 123, 255);
     doc.setTextColor(255);
     doc.setFont(undefined, 'bold');
@@ -254,16 +208,13 @@
       doc.text(h, x, startY);
       x += colWidths[i];
     });
-
     startY += 6;
     doc.setFont(undefined, 'normal');
     doc.setTextColor(0);
-
     let total = 0;
     data.forEach((d, i) => {
       if (startY > 280) {
-        doc.addPage();
-        startY = 20;
+        doc.addPage(); startY = 20;
       }
       if (i % 2 === 0) {
         doc.setFillColor(240, 240, 240);
@@ -283,12 +234,10 @@
       startY += rowHeight;
       total += d.amount;
     });
-
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 102, 255);
     startY += 6;
     doc.text(`Net Total: ₱${total.toFixed(2)}`, startX, startY);
-
     doc.save(`${user}_savings_report.pdf`);
   }
 
@@ -302,18 +251,30 @@
     if (newUsername && newUsername !== user) {
       if (users[newUsername]) return alert("Username already exists");
       users[newUsername] = newPassword || users[user];
-      localStorage.setItem('data_' + newUsername, localStorage.getItem('data_' + user));
       delete users[user];
-      localStorage.removeItem('data_' + user);
+      const data = localStorage.getItem('data_' + user);
+      if (data) {
+        localStorage.setItem('data_' + newUsername, data);
+        localStorage.removeItem('data_' + user);
+      }
       localStorage.setItem('currentUser', newUsername);
     } else if (newPassword) {
       users[user] = newPassword;
     }
     setUsers(users);
-    alert("Settings updated!");
+    alert("Settings updated");
     switchPage('dashboard');
   }
-</script>
 
+  // On page load, keep user logged in if already authenticated
+  window.onload = function () {
+    const user = localStorage.getItem('currentUser');
+    if (user) {
+      switchPage('dashboard');
+    } else {
+      switchPage('loginPage');
+    }
+  };
+</script>
 </body>
 </html>
