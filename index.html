@@ -1,228 +1,319 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maki Web - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Savings Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
-      background: #f5f5f5;
+      background: #f0f0f0;
     }
-    .login-container, .main-container {
-      width: 90%;
-      max-width: 600px;
-      margin: 40px auto;
+    .page {
+      display: none;
+      height: 100vh;
+      width: 100vw;
+      flex-direction: column;
+    }
+    .active {
+      display: flex !important;
+    }
+    #loginPage, #signupPage, #dashboard, #settingsPage {
+      justify-content: center;
+      align-items: center;
+      background: #f0f0f0;
+    }
+    .container {
       background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      box-sizing: border-box;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+      max-height: 95vh;
+      overflow-y: auto;
     }
-    h2, h3 {
+    h2 {
       text-align: center;
-      color: #666;
+      margin-bottom: 20px;
+      color: #0062ff;
     }
-    label, input, button {
-      display: block;
+    input, select, button {
       width: 100%;
-      margin-top: 10px;
-      box-sizing: border-box;
-    }
-    input, button {
-      padding: 10px;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
     }
     button {
-      background: #666;
+      background-color: #0062ff;
       color: white;
-      border: none;
+      font-weight: bold;
       cursor: pointer;
     }
-    .table-wrapper {
-      overflow-x: auto;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-top: 20px;
+    .link {
+      text-align: center;
+      margin-top: 10px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
+    .link a {
+      text-decoration: none;
+      color: #0062ff;
+      font-size: 14px;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    .highlight {
-      background: #f9f9f9;
-    }
-    @media (max-width: 600px) {
-      input, button {
-        font-size: 16px;
-      }
-      table, thead, tbody, th, td, tr {
-        display: block;
-        width: 100%;
-      }
-      thead tr {
-        display: none;
-      }
-      td {
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-        border: none;
-        border-bottom: 1px solid #ddd;
-      }
-      td::before {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        width: 45%;
-        padding-right: 10px;
-        white-space: nowrap;
-        text-align: left;
-        font-weight: bold;
-      }
-      td:nth-of-type(1)::before { content: "No."; }
-      td:nth-of-type(2)::before { content: "Date"; }
-      td:nth-of-type(3)::before { content: "Amount (₱)"; }
-      td:nth-of-type(4)::before { content: "Item"; }
-    }
+    .danger { background: #e74c3c; }
+    .green { background: #2ecc71; }
+    .orange { background: #f39c12; }
+    .total { text-align: center; font-weight: bold; margin: 10px 0; color: green; }
+    ul { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+    li { background: #eee; margin: 5px 0; padding: 8px; border-radius: 6px; font-size: 14px; }
+    canvas { max-width: 100%; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="login-container" id="login">
-    <h2>Maki Web</h2>
-    <label for="username">Username:</label>
-    <input type="text" id="username" />
-    <label for="password">Password:</label>
-    <input type="password" id="password" />
+
+<!-- Login Page -->
+<div id="loginPage" class="page active">
+  <div class="container">
+    <h2>Savings Tracker</h2>
+    <input type="text" id="loginUser" placeholder="Username" />
+    <input type="password" id="loginPass" placeholder="Password" />
     <button onclick="login()">Login</button>
-    <p id="loginError" style="color:red;"></p>
+    <div class="link"><a href="#" onclick="switchPage('signupPage')">Sign up</a></div>
   </div>
+</div>
 
-  <div class="main-container" id="main" style="display:none;">
-    <h2>Expense Report</h2>
-    <label>Income (₱):</label>
-    <input type="number" id="income" />
-    <button onclick="updateIncome()">Update Income</button>
-    <p><strong>Income:</strong> ₱<span id="displayIncome">0.00</span></p>
-    <p><strong>Expenses:</strong> ₱<span id="displayExpenses">0.00</span></p>
-    <p><strong>Balance:</strong> ₱<span id="displayBalance">0.00</span></p>
-
-    <h3>Add Expense</h3>
-    <label>Date:</label>
-    <input type="date" id="expDate" />
-    <label>Amount (₱):</label>
-    <input type="number" id="expAmount" />
-    <label>Item:</label>
-    <input type="text" id="expItem" />
-    <button onclick="addExpense()">Add Expense</button>
-
-    <div class="table-wrapper">
-      <table id="expenseTable">
-        <thead>
-          <tr><th>No.</th><th>Date</th><th>Amount (₱)</th><th>Item</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <hr />
-    <h3>Settings</h3>
-    <label for="newUsername">New Username:</label>
-    <input type="text" id="newUsername" />
-    <label for="newPassword">New Password:</label>
-    <input type="password" id="newPassword" />
-    <button onclick="changeCredentials()">Save New Credentials</button>
-    <p id="settingsMsg" style="color:green;"></p>
+<!-- Signup Page -->
+<div id="signupPage" class="page">
+  <div class="container">
+    <h2>Create Account</h2>
+    <input type="text" id="newUser" placeholder="Username" />
+    <input type="password" id="newPass" placeholder="Password" />
+    <button onclick="signup()">Sign Up</button>
+    <div class="link"><a href="#" onclick="switchPage('loginPage')">Back to Login</a></div>
   </div>
+</div>
 
-  <script>
-    const defaultUsers = {
-      'Tyri': '0452',
-      'Maki': '112621',
-      'Tapado': '0000'
-    };
+<!-- Dashboard -->
+<div id="dashboard" class="page">
+  <div class="container">
+    <h2>Welcome, <span id="usernameDisplay"></span></h2>
+    <input type="number" id="amount" placeholder="Enter amount" />
+    <select id="action">
+      <option value="add">Add Savings</option>
+      <option value="cashout">Cash Out</option>
+    </select>
+    <button onclick="addEntry()">Submit</button>
+    <input type="month" id="filterMonth" onchange="loadData()" />
+    <div class="total" id="totalDisplay">Total: ₱0</div>
+    <ul id="entryList"></ul>
+    <canvas id="chart" height="200"></canvas>
+    <button class="green" onclick="exportPDF()">Export PDF</button>
+    <button class="orange" onclick="switchPage('settingsPage')">Settings</button>
+    <button class="danger" onclick="logout()">Logout</button>
+  </div>
+</div>
 
-    function getStoredUsers() {
-      let stored = JSON.parse(localStorage.getItem('customUsers') || '{}');
-      return { ...defaultUsers, ...stored };
-    }
+<!-- Settings Page -->
+<div id="settingsPage" class="page">
+  <div class="container">
+    <h2>Settings</h2>
+    <input type="text" id="changeUsername" placeholder="New Username" />
+    <input type="password" id="oldPass" placeholder="Current Password" />
+    <input type="password" id="newPass1" placeholder="New Password" />
+    <button onclick="updateSettings()">Update</button>
+    <button onclick="switchPage('dashboard')">Back</button>
+  </div>
+</div>
 
-    function login() {
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-      const allUsers = getStoredUsers();
-      if (allUsers[username] === password) {
-        document.getElementById('login').style.display = 'none';
-        document.getElementById('main').style.display = 'block';
-        loadData();
-      } else {
-        document.getElementById('loginError').innerText = 'Invalid credentials';
-      }
-    }
+<script>
+  const USERS_KEY = 'savings_users';
 
-    function changeCredentials() {
-      const newUser = document.getElementById('newUsername').value;
-      const newPass = document.getElementById('newPassword').value;
-      if (!newUser || !newPass) {
-        document.getElementById('settingsMsg').style.color = 'red';
-        document.getElementById('settingsMsg').innerText = 'Both fields are required';
-        return;
-      }
-      let current = JSON.parse(localStorage.getItem('customUsers') || '{}');
-      current[newUser] = newPass;
-      localStorage.setItem('customUsers', JSON.stringify(current));
-      document.getElementById('settingsMsg').style.color = 'green';
-      document.getElementById('settingsMsg').innerText = 'New credentials saved!';
-    }
+  function getUsers() {
+    return JSON.parse(localStorage.getItem(USERS_KEY)) || { Tapado: '0000' };
+  }
 
-    function updateIncome() {
-      const income = parseFloat(document.getElementById('income').value) || 0;
-      localStorage.setItem('income', income);
-      localStorage.setItem('expenses', '0');
-      localStorage.setItem('expenseList', JSON.stringify([]));
+  function setUsers(users) {
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  }
+
+  function switchPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (id === 'dashboard') {
+      const user = localStorage.getItem('currentUser');
+      document.getElementById('usernameDisplay').textContent = user;
+      document.getElementById('changeUsername').value = '';
+      document.getElementById('oldPass').value = '';
+      document.getElementById('newPass1').value = '';
       loadData();
     }
+  }
 
-    function addExpense() {
-      const date = document.getElementById('expDate').value;
-      const amount = parseFloat(document.getElementById('expAmount').value);
-      const item = document.getElementById('expItem').value;
-      if (!date || !amount || !item) return;
+  function signup() {
+    const u = newUser.value.trim(), p = newPass.value.trim();
+    if (!u || !p) return alert("Fill all fields");
+    let users = getUsers();
+    if (users[u]) return alert("Username already exists");
+    users[u] = p;
+    setUsers(users);
+    alert("Account created!");
+    switchPage('loginPage');
+  }
 
-      let expenseList = JSON.parse(localStorage.getItem('expenseList') || '[]');
-      expenseList.push({ date, amount, item });
-      localStorage.setItem('expenseList', JSON.stringify(expenseList));
+  function login() {
+    const u = loginUser.value.trim(), p = loginPass.value.trim();
+    let users = getUsers();
+    if (users[u] === p) {
+      localStorage.setItem('currentUser', u);
+      switchPage('dashboard');
+    } else alert("Invalid login");
+  }
 
-      let totalExpenses = expenseList.reduce((sum, e) => sum + e.amount, 0);
-      localStorage.setItem('expenses', totalExpenses);
-      loadData();
-    }
+  function logout() {
+    localStorage.removeItem('currentUser');
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    switchPage('loginPage');
+  }
 
-    function loadData() {
-      const income = parseFloat(localStorage.getItem('income') || '0');
-      const expenses = parseFloat(localStorage.getItem('expenses') || '0');
-      const balance = income - expenses;
-      document.getElementById('displayIncome').innerText = income.toFixed(2);
-      document.getElementById('displayExpenses').innerText = expenses.toFixed(2);
-      document.getElementById('displayBalance').innerText = balance.toFixed(2);
+  function addEntry() {
+    const amt = parseFloat(amount.value), type = action.value;
+    if (!amt || amt <= 0) return alert("Enter valid amount");
+    const user = localStorage.getItem('currentUser');
+    let data = JSON.parse(localStorage.getItem('data_' + user)) || [];
+    data.push({ amount: type === 'add' ? amt : -amt, date: new Date().toISOString() });
+    localStorage.setItem('data_' + user, JSON.stringify(data));
+    amount.value = '';
+    loadData();
+  }
 
-      const expenseList = JSON.parse(localStorage.getItem('expenseList') || '[]');
-      const tbody = document.querySelector('#expenseTable tbody');
-      tbody.innerHTML = '';
-      expenseList.forEach((e, i) => {
-        const row = `<tr><td>${i + 1}</td><td>${e.date}</td><td>${e.amount.toFixed(2)}</td><td>${e.item}</td></tr>`;
-        tbody.innerHTML += row;
+  function loadData() {
+    const user = localStorage.getItem('currentUser');
+    let data = JSON.parse(localStorage.getItem('data_' + user)) || [];
+    const month = filterMonth.value;
+    let total = 0, saved = 0, cashout = 0;
+    let list = "";
+    data.filter(d => !month || d.date.startsWith(month)).forEach(d => {
+      const val = Math.abs(d.amount).toFixed(2);
+      const date = new Date(d.date).toLocaleString();
+      list += `<li>${d.amount > 0 ? 'Saved' : 'Cash Out'} ₱${val} on ${date}</li>`;
+      total += d.amount;
+      if (d.amount > 0) saved += d.amount;
+      else cashout += Math.abs(d.amount);
+    });
+    entryList.innerHTML = list;
+    totalDisplay.textContent = `Total: ₱${total.toFixed(2)}`;
+    renderChart(saved, cashout);
+  }
+
+  let chart;
+  function renderChart(s, c) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    if (chart) chart.destroy();
+    chart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Savings', 'Cash Outs'],
+        datasets: [{ data: [s, c], backgroundColor: ['#2ecc71', '#e74c3c'] }]
+      }
+    });
+  }
+
+  function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    const user = localStorage.getItem('currentUser');
+    let data = JSON.parse(localStorage.getItem('data_' + user)) || [];
+
+    doc.setFontSize(22);
+    doc.setTextColor(0, 102, 255);
+    doc.text("Savings Report", 14, 20);
+
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`User: ${user}`, 14, 28);
+
+    const headers = ["#", "Type", "Amount (₱)", "Date"];
+    const colWidths = [10, 30, 35, 110];
+    const startX = 14;
+    let startY = 36;
+    const rowHeight = 10;
+
+    doc.setFillColor(0, 123, 255);
+    doc.setTextColor(255);
+    doc.setFont(undefined, 'bold');
+    let x = startX;
+    headers.forEach((h, i) => {
+      doc.text(h, x, startY);
+      x += colWidths[i];
+    });
+
+    startY += 6;
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(0);
+
+    let total = 0;
+    data.forEach((d, i) => {
+      if (startY > 280) {
+        doc.addPage();
+        startY = 20;
+      }
+      if (i % 2 === 0) {
+        doc.setFillColor(240, 240, 240);
+        doc.rect(startX - 2, startY - 5, colWidths.reduce((a, b) => a + b, 0) + 4, rowHeight, 'F');
+      }
+      const row = [
+        `${i + 1}`,
+        d.amount > 0 ? "Saved" : "Cash Out",
+        Math.abs(d.amount).toFixed(2),
+        new Date(d.date).toLocaleString()
+      ];
+      x = startX;
+      row.forEach((txt, j) => {
+        doc.text(txt, x, startY);
+        x += colWidths[j];
       });
+      startY += rowHeight;
+      total += d.amount;
+    });
+
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 102, 255);
+    startY += 6;
+    doc.text(`Net Total: ₱${total.toFixed(2)}`, startX, startY);
+
+    doc.save(`${user}_savings_report.pdf`);
+  }
+
+  function updateSettings() {
+    const user = localStorage.getItem('currentUser');
+    const users = getUsers();
+    const newUsername = document.getElementById('changeUsername').value.trim();
+    const oldPassword = document.getElementById('oldPass').value.trim();
+    const newPassword = document.getElementById('newPass1').value.trim();
+    if (users[user] !== oldPassword) return alert("Incorrect password");
+    if (newUsername && newUsername !== user) {
+      if (users[newUsername]) return alert("Username already exists");
+      users[newUsername] = newPassword || users[user];
+      localStorage.setItem('data_' + newUsername, localStorage.getItem('data_' + user));
+      delete users[user];
+      localStorage.removeItem('data_' + user);
+      localStorage.setItem('currentUser', newUsername);
+    } else if (newPassword) {
+      users[user] = newPassword;
     }
-  </script>
+    setUsers(users);
+    alert("Settings updated!");
+    switchPage('dashboard');
+  }
+</script>
+
 </body>
 </html>
